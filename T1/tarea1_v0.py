@@ -3,6 +3,7 @@ from OpenGL.GL import *
 import OpenGL.GL.shaders
 import numpy
 import sys
+from damas import concat_damas
 
 __author__ = "Ivan Sipiran"
 __license__ = "MIT"
@@ -10,20 +11,6 @@ __license__ = "MIT"
 # We will use 32 bits data, so an integer has 4 bytes
 # 1 byte = 8 bits
 SIZE_IN_BYTES = 4
-
-def crear_dama(x,y,r,g,b,radius):
-    
-    circle = []
-    for angle in range(0,360,10):
-        circle.extend([x, y, 0.0, r, g, b])
-        circle.extend([x+numpy.cos(numpy.radians(angle))*radius, 
-                       y+numpy.sin(numpy.radians(angle))*radius, 
-                       0.0, r, g, b])
-        circle.extend([x+numpy.cos(numpy.radians(angle+10))*radius, 
-                       y+numpy.sin(numpy.radians(angle+10))*radius, 
-                       0.0, r, g, b])
-    
-    return numpy.array(circle, dtype = numpy.float32)
 
 # Esta funcion crea un fondo negro, sobre la cual vamos a poner las casillas blancas
 def crear_fondo():
@@ -56,7 +43,7 @@ def crear_cuadrado(x, y, r, g, b):
 def crear_tablero():
     output = []
     for i in range(8):
-        # las filas pares el primer cuadrado blanco empieza en (-0.75, -0.75)
+        # en las filas pares el primer cuadrado blanco empieza en (-0.75, -0.75)
         if i % 2 == 0:
             # creamos 4 casillas blancas a una distancia de 0.375 cada una
             for j in range(4):
@@ -79,7 +66,7 @@ if __name__ == "__main__":
     width = 600
     height = 600
 
-    window = glfw.create_window(width, height, "Tarea 1", None, None)
+    window = glfw.create_window(width, height, "Tarea 1 - Diego Pizarro W.", None, None)
 
     if not window:
         glfw.terminate()
@@ -89,8 +76,8 @@ if __name__ == "__main__":
 
     fondo = crear_fondo()
     tablero = crear_tablero()
-    #cuadrado2 = crear_tableros(-0.5625, -0.5625)
-
+    dama = concat_damas()
+    
     # Defining shaders for our pipeline
     vertex_shader = """
     #version 330
@@ -135,10 +122,10 @@ if __name__ == "__main__":
     glBindBuffer(GL_ARRAY_BUFFER, vboTablero)
     glBufferData(GL_ARRAY_BUFFER, len(tablero) * SIZE_IN_BYTES, tablero, GL_STATIC_DRAW)
 
-    """ vboCuadrado2 = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, vboCuadrado2)
-    glBufferData(GL_ARRAY_BUFFER, len(cuadrado2) * SIZE_IN_BYTES, cuadrado2, GL_STATIC_DRAW)
-     """
+    vboDama = glGenBuffers(1)
+    glBindBuffer(GL_ARRAY_BUFFER, vboDama)
+    glBufferData(GL_ARRAY_BUFFER, len(dama) * SIZE_IN_BYTES, dama, GL_STATIC_DRAW)
+
     # Telling OpenGL to use our shader program
     glUseProgram(shaderProgram)
 
@@ -168,6 +155,18 @@ if __name__ == "__main__":
     glEnableVertexAttribArray(color)
     # SE DIBUJA LA FIGURA 3
     glDrawArrays(GL_TRIANGLES, 0, int(len(tablero)/6))   
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboDama)
+    position = glGetAttribLocation(shaderProgram, "position")
+    glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
+    glEnableVertexAttribArray(position)
+
+    color = glGetAttribLocation(shaderProgram, "color")
+    glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
+    glEnableVertexAttribArray(color)
+    
+    # It renders a scene using the active shader program (pipeline) and the active VAO (shapes)
+    glDrawArrays(GL_TRIANGLES, 0, int(len(dama)/6))
 
     # Moving our draw to the active color buffer
     glfw.swap_buffers(window)
