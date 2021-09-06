@@ -2,8 +2,6 @@ import glfw
 from OpenGL.GL import *
 import OpenGL.GL.shaders
 import numpy
-import sys
-from damas import concat_damas
 
 __author__ = "Ivan Sipiran"
 __license__ = "MIT"
@@ -55,6 +53,40 @@ def crear_tablero():
                 output.extend(crear_cuadrado(-0.5625 + 0.375 * j, -0.75 + 0.1875 * i, 1, 1, 1))
     
     return numpy.array(output, dtype=numpy.float32)
+
+def crear_dama(x,y,r,g,b,radius):
+    
+    circle = []
+    for angle in range(0,360,10):
+        circle.extend([x, y, 0.0, r, g, b])
+        circle.extend([x+numpy.cos(numpy.radians(angle))*radius, 
+                       y+numpy.sin(numpy.radians(angle))*radius, 
+                       0.0, r, g, b])
+        circle.extend([x+numpy.cos(numpy.radians(angle+10))*radius, 
+                       y+numpy.sin(numpy.radians(angle+10))*radius, 
+                       0.0, r, g, b])
+    
+    return numpy.array(circle, dtype = numpy.float32)
+
+# Crea las 24 damas en sus posiciones correctas
+def concat_damas():
+    damas_red = numpy.array([], dtype=numpy.float32)
+    damas_blue = numpy.array([], dtype=numpy.float32)
+
+    # creamos 3 filas de damas azules
+    for i in range(0, 4):
+        damas_blue = numpy.append(damas_blue, crear_dama(-0.46875 + 0.375 * i, -0.65625, 0.0, 0.0, 1.0, 0.08))
+        damas_blue = numpy.append(damas_blue, crear_dama(-0.65625 + 0.375 * i, -0.65625 + 0.1875, 0.0, 0.0, 1.0, 0.08))
+        damas_blue = numpy.append(damas_blue, crear_dama(-0.46875 + 0.375 * i, -0.65625 + 0.1875 * 2, 0.0, 0.0, 1.0, 0.08))
+    
+    # creamos 3 filas de damas rojas
+    for i in range(0, 4):
+        damas_red = numpy.append(damas_red, crear_dama(-0.65625 + 0.375 * i,-0.65625 + 0.1875 * 5, 1.0, 0.0, 0.0, 0.08))
+        damas_red = numpy.append(damas_red, crear_dama(-0.46875 + 0.375 * i,-0.65625 + 0.1875 * 6, 1.0, 0.0, 0.0, 0.08))
+        damas_red = numpy.append(damas_red, crear_dama(-0.65625 + 0.375 * i,-0.65625 + 0.1875 * 7, 1.0, 0.0, 0.0, 0.08))
+    
+    return numpy.append(damas_red, damas_blue)
+
 
 if __name__ == "__main__":
 
@@ -134,7 +166,7 @@ if __name__ == "__main__":
 
     glClear(GL_COLOR_BUFFER_BIT)
 
-    # SETUP DE LA FIGURA 1
+    # Setup del Fondo
     glBindBuffer(GL_ARRAY_BUFFER, vboFondo)
     position = glGetAttribLocation(shaderProgram, "position") # Buscar la variable position en el shader, solo es necesario hacer una vez por ShaderProgram
     glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
@@ -143,19 +175,22 @@ if __name__ == "__main__":
     color = glGetAttribLocation(shaderProgram, "color") # Buscar la variable color en el shader, solo es necesario hacer una vez por ShaderProgram
     glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
     glEnableVertexAttribArray(color)
-    # SE DIBUJA LA FIGURA 1
+    
+    # Dibujamos el fondo
     glDrawArrays(GL_TRIANGLES, 0, int(len(fondo)/6))
 
-    # SETUP DE LA FIGURA 3
+    # Setup de los cuadrados blancos del tablero
     glBindBuffer(GL_ARRAY_BUFFER, vboTablero)
     glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
     glEnableVertexAttribArray(position)
 
     glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
     glEnableVertexAttribArray(color)
-    # SE DIBUJA LA FIGURA 3
+    
+    # Dibujamos los cuadrados
     glDrawArrays(GL_TRIANGLES, 0, int(len(tablero)/6))   
-
+    
+    # Setup de las dams
     glBindBuffer(GL_ARRAY_BUFFER, vboDama)
     position = glGetAttribLocation(shaderProgram, "position")
     glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(0))
@@ -165,7 +200,7 @@ if __name__ == "__main__":
     glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, 24, ctypes.c_void_p(12))
     glEnableVertexAttribArray(color)
     
-    # It renders a scene using the active shader program (pipeline) and the active VAO (shapes)
+    # Dibujamos las damas
     glDrawArrays(GL_TRIANGLES, 0, int(len(dama)/6))
 
     # Moving our draw to the active color buffer
