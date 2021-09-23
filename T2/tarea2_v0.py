@@ -8,13 +8,13 @@ import numpy as np
 import sys
 import os.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import grafica.transformations as tr
-import grafica.basic_shapes as bs
-import grafica.scene_graph as sg
-import grafica.easy_shaders as es
-import grafica.lighting_shaders as ls
-import grafica.performance_monitor as pm
-from grafica.assets_path import getAssetPath
+import transformations as tr
+import basic_shapes as bs
+import scene_graph as sg
+import easy_shaders as es
+import lighting_shaders as ls
+import performance_monitor as pm
+from  assets_path import getAssetPath
 
 __author__ = "Ivan Sipiran"
 __license__ = "MIT"
@@ -157,6 +157,8 @@ def createScene(pipeline):
 
 if __name__ == "__main__":
 
+    window = None
+    
     # Initialize glfw
     if not glfw.init():
         glfw.set_window_should_close(window, True)
