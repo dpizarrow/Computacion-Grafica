@@ -1,6 +1,8 @@
 # coding=utf-8
-"""Tarea 2"""
+"""Tarea 2: Diego Pizarro W
+    Se eligio el modelo 5 de la carpeta carro"""
 
+from os import pipe
 import glfw
 from OpenGL.GL import *
 import OpenGL.GL.shaders
@@ -126,33 +128,136 @@ def createGPUShape(pipeline, shape):
 
 #NOTA: Aqui creas tu escena. En escencia, sólo tendrías que modificar esta función.
 def createScene(pipeline):
-    sphere = createGPUShape(pipeline, bs.createColorSphereTarea2(0.0, 0.59, 0.78))
-    cone = createGPUShape(pipeline, bs.createColorConeTarea2(1.0,0.73,0.03))
-    cube = createGPUShape(pipeline, bs.createColorCubeTarea2(1.0,0.0,0.0))
-    cylinder = createGPUShape(pipeline, bs.createColorCylinderTarea2(0.0,1.0,0.0))
-
-    sphereNode = sg.SceneGraphNode('sphere')
-    sphereNode.transform = tr.matmul([tr.translate(1.0, 1.0, 1.0), tr.uniformScale(0.5)])
-    sphereNode.childs += [sphere]
-
-    cubeNode = sg.SceneGraphNode('cube')
-    cubeNode.transform = tr.matmul([tr.translate(-1.0, 1.0, 1.0) , tr.uniformScale(0.5)])
-    cubeNode.childs += [cube]
-
-    cylinderNode = sg.SceneGraphNode('cylinder')
-    cylinderNode.transform = tr.matmul([tr.translate(1.0, 1.0, -1.0) , tr.uniformScale(0.5)])
-    cylinderNode.childs += [cylinder]
     
-    coneNode = sg.SceneGraphNode('cone')
-    coneNode.transform = tr.matmul([tr.translate(-1.0, 1.0, -1.0) , tr.uniformScale(0.5)])
-    coneNode.childs += [cone]
+    # Creamos un cilindro que representara los neumaticos de la camioneta
+    wheel = createGPUShape(pipeline, bs.createColorCylinderTarea2(0.0,0.0,0.0))
+    
+    # Creamos un cilindro que representara las llantas
+    wheelcover = createGPUShape(pipeline, bs.createColorCylinderTarea2(1.0, 1.0, 1.0))
+    
+    # Creamos un cubo que se usara para las distintas partes del chassis de la camioneta
+    body = createGPUShape(pipeline, bs.createColorCubeTarea2(0.0, 0.0, 1.0))
 
+    # Creamos un cubo que se usara para los detalles de la parte delantera de la camioneta
+    details = createGPUShape(pipeline, bs.createColorCubeTarea2(0.411, 0.411, 0.411))
+
+    # Rueda delantera izquierda
+    frontLeft = sg.SceneGraphNode('frontLeft')
+    frontLeft.transform = tr.matmul([tr.translate(0.8, 0.5, -0.5) , tr.scale(0.25, 0.25, 0.1), tr.rotationX(np.pi/2)])
+    frontLeft.childs += [wheel]
+    
+    # Rueda delantera derecha
+    frontRight = sg.SceneGraphNode('frontRight')
+    frontRight.transform = tr.matmul([tr.translate(0.8, 0.5, 0.5) , tr.scale(0.25, 0.25, 0.1), tr.rotationX(np.pi/2)])
+    frontRight.childs += [wheel]
+
+    # Rueda trasera izquierda
+    rearLeft = sg.SceneGraphNode('rearLeft')
+    rearLeft.transform  = tr.matmul([tr.translate(-0.7, 0.5, -0.5) , tr.scale(0.25, 0.25, 0.1), tr.rotationX(np.pi/2)])
+    rearLeft.childs += [wheel]
+
+    # Rueda trasera derecha
+    rearRight = sg.SceneGraphNode('rearRight')
+    rearRight.transform  = tr.matmul([tr.translate(-0.7, 0.5, 0.5) , tr.scale(0.25, 0.25, 0.1), tr.rotationX(np.pi/2)])
+    rearRight.childs += [wheel]
+
+    # Parte central de la camioneta
+    middleBody = sg.SceneGraphNode('middleBody')
+    middleBody.transform = tr.matmul([tr.translate(0.35, 0.8, 0.0), tr.scale(0.65, 0.1, 0.5), tr.rotationY(np.pi/2)])
+    middleBody.childs += [body]
+
+    # Parte derecha del pickup de la camioneta
+    rightPickup = sg.SceneGraphNode('rightPickup')
+    rightPickup.transform = tr.matmul([tr.translate(-0.2, 0.7, 0.49), tr.scale(1.2, 0.2, 0.04)])
+    rightPickup.childs += [body]
+
+    # Parte izquierda del pickup de la camioneta
+    leftPickup = sg.SceneGraphNode('leftPickup')
+    leftPickup.transform = tr.matmul([tr.translate(-0.2, 0.7, -0.49), tr.scale(1.2, 0.2, 0.04)])
+    leftPickup.childs += [body]
+
+    # Parte trasera del pickup
+    backPickup = sg.SceneGraphNode('backPickup')
+    backPickup.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(-0.02, 0.7, -1.4), tr.scale(0.5, 0.2, 0.025)])
+    backPickup.childs += [body]
+
+    # Parachoque de la camioneta
+    grill = sg.SceneGraphNode('grill')
+    grill.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(0.0, 0.7, 1), tr.scale(0.55, 0.2, 0.025)])
+    grill.childs += [body]
+
+    # Piso del pickup
+    bottomPickup = sg.SceneGraphNode('bottomPickup')
+    bottomPickup.transform = tr.matmul([tr.rotationX(np.pi), tr.translate(-0.65, -0.6, 0), tr.scale(0.7, 0.05, 0.45)])
+    bottomPickup.childs += [body]
+
+    # Parabrisas de la camioneta
+    windshield = sg.SceneGraphNode('windshield')
+    windshield.transform = tr.matmul([tr.rotationY(np.pi/2), tr.rotationX(-np.pi/4), tr.translate(0.0, 0.4, 1.0), tr.scale(0.5, 0.2, 0.025)])
+    windshield.childs += [body]
+
+    # Parte trasera de la camioneta, se conectara con el techo
+    backBody = sg.SceneGraphNode('backBody')
+    backBody.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(-0.02, 1.0, -0.3), tr.scale(0.5, 0.14, 0.025)])
+    backBody.childs += [body]
+
+    # Techo de la camioneta
+    roof = sg.SceneGraphNode('roof')
+    roof.transform = tr.matmul([tr.rotationX(np.pi), tr.translate(-0.01, -1.15, 0.0), tr.scale(0.33, 0.03, 0.45)])
+    roof.childs += [body]
+    
+    # Llanta delantera izquierda
+    flwheelCover = sg.SceneGraphNode('flwheelCover')
+    flwheelCover.transform = tr.matmul([tr.translate(0.8, 0.5, -0.6) , tr.scale(0.15, 0.15, 0.01), tr.rotationX(np.pi/2)])
+    flwheelCover.childs += [wheelcover]
+
+    # Llanta delantera derecha
+    frwheelCover = sg.SceneGraphNode('frwheelCover')
+    frwheelCover.transform = tr.matmul([tr.translate(0.8, 0.5, 0.6) , tr.scale(0.15, 0.15, 0.01), tr.rotationX(np.pi/2)])
+    frwheelCover.childs += [wheelcover]
+
+    # Llanta trasera izquierda
+    blwheelCover = sg.SceneGraphNode('blwheelCover')
+    blwheelCover.transform = tr.matmul([tr.translate(-0.7, 0.5, -0.6) , tr.scale(0.15, 0.15, 0.01), tr.rotationX(np.pi/2)])
+    blwheelCover.childs += [wheelcover]
+
+    # Llanta trasera derecha
+    brwheelCover = sg.SceneGraphNode('brwheelCover')
+    brwheelCover.transform = tr.matmul([tr.translate(-0.7, 0.5, 0.6) , tr.scale(0.15, 0.15, 0.01), tr.rotationX(np.pi/2)])
+    brwheelCover.childs += [wheelcover]
+
+    # Base para los detalles del parachoque
+    bumper = sg.SceneGraphNode('bumper')
+    bumper.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(-0.02, 0.7, 1.05), tr.scale(0.5, 0.1, 0.001)])
+    bumper.childs += [details]
+
+    # Parachoque trasero
+    rearBumper = sg.SceneGraphNode('rearBumper')
+    rearBumper.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(-0.02, 0.5, -1.43), tr.scale(0.5, 0.1, 0.001)])
+    rearBumper.childs += [details]
+
+    # Creamos el grafo de escena y los nodos 
     scene = sg.SceneGraphNode('system')
-    scene.childs += [coneNode]
-    scene.childs += [sphereNode]
-    scene.childs += [cubeNode]
-    scene.childs += [cylinderNode]
     
+    # Nodo para los neumaticos 
+    wheelsNode = sg.SceneGraphNode('wheels')
+    
+    # Nodo para el chassis
+    bodyNode = sg.SceneGraphNode('body')
+    
+    # Nodo para las llantas
+    coverNode = sg.SceneGraphNode('covers')
+
+    # Nodo para los detalles del parachoque
+    bumperNode = sg.SceneGraphNode('bumper')
+    
+    wheelsNode.childs += [frontLeft, frontRight, rearLeft, rearRight]
+    bodyNode.childs += [middleBody, rightPickup, leftPickup, backPickup, bottomPickup, grill, windshield, backBody, roof]
+    coverNode.childs += [flwheelCover, frwheelCover, blwheelCover, brwheelCover]
+    bumperNode.childs += [bumper, rearBumper]
+    scene.childs += [wheelsNode, bodyNode, coverNode, bumperNode]
+    
+    scene.transform = tr.matmul([tr.uniformScale(2)])
     return scene
 
 if __name__ == "__main__":
