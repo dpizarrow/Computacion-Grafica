@@ -141,6 +141,15 @@ def createScene(pipeline):
     # Creamos un cubo que se usara para los detalles de la parte delantera de la camioneta
     details = createGPUShape(pipeline, bs.createColorCubeTarea2(0.411, 0.411, 0.411))
 
+    # Creamos un cubo blanco para el asiento
+    asiento = createGPUShape(pipeline, bs.createColorCubeTarea2(1.0, 1.0, 1.0))
+
+    # Creamos un cubo para el vidrio
+    glass = createGPUShape(pipeline, bs.createColorCubeTarea2(0.560, 0.901, 1))
+
+    # Creamos un cubo para los detalles del frente de la camioneta
+    grilldetails = createGPUShape(pipeline, bs.createColorCubeTarea2(0, 0, 0))
+
     # Rueda delantera izquierda
     frontLeft = sg.SceneGraphNode('frontLeft')
     frontLeft.transform = tr.matmul([tr.translate(0.8, 0.5, -0.5) , tr.scale(0.25, 0.25, 0.1), tr.rotationX(np.pi/2)])
@@ -228,13 +237,72 @@ def createScene(pipeline):
 
     # Base para los detalles del parachoque
     bumper = sg.SceneGraphNode('bumper')
-    bumper.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(-0.02, 0.7, 1.05), tr.scale(0.5, 0.1, 0.001)])
+    bumper.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(-0.02, 0.7, 1.05), tr.scale(0.5, 0.15, 0.001)])
     bumper.childs += [details]
+
+    # Vidrio del parabrisa
+    windshieldGlass = sg.SceneGraphNode('windshieldGlass')
+    windshieldGlass.transform = tr.matmul([tr.rotationY(np.pi/2), tr.rotationX(-np.pi/4), tr.translate(0.0, 0.4, 1.05), tr.scale(0.35, 0.1, 0.01)])
+    windshieldGlass.childs += [glass]
 
     # Parachoque trasero
     rearBumper = sg.SceneGraphNode('rearBumper')
     rearBumper.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(-0.02, 0.5, -1.43), tr.scale(0.5, 0.1, 0.001)])
     rearBumper.childs += [details]
+
+    # Asientos de la camioneta
+    seat = sg.SceneGraphNode('asiento')
+    seat.transform = tr.matmul([tr.scale(0.05, 0.2, 0.3), tr.translate(-5, 4.5, 0.05)])
+    seat.childs += [asiento]
+
+    # Detalles de la parte delantera
+    det1 = sg.SceneGraphNode('detail1')
+    det1.transform = tr.matmul([tr.translate(1.05, 0.77, 0.4), tr.scale(0.01, 0.05, 0.05)])
+    det1.childs += [grilldetails]
+
+    det2 = sg.SceneGraphNode('detail2')
+    det2.transform = tr.matmul([tr.translate(1.05, 0.77, 0.25), tr.scale(0.01, 0.05, 0.05)])
+    det2.childs += [grilldetails]
+    
+    det3 = sg.SceneGraphNode('detail3')
+    det3.transform = tr.matmul([tr.translate(1.05, 0.77, 0.1), tr.scale(0.01, 0.05, 0.05)])
+    det3.childs += [grilldetails]
+
+    det4 = sg.SceneGraphNode('detail4')
+    det4.transform = tr.matmul([tr.translate(1.05, 0.77, -0.05), tr.scale(0.01, 0.05, 0.05)])
+    det4.childs += [grilldetails]    
+
+    det5 = sg.SceneGraphNode('detail5')
+    det5.transform = tr.matmul([tr.translate(1.05, 0.77, -0.2), tr.scale(0.01, 0.05, 0.05)])
+    det5.childs += [grilldetails]
+
+    det6 = sg.SceneGraphNode('detail6')
+    det6.transform = tr.matmul([tr.translate(1.05, 0.77, -0.35), tr.scale(0.01, 0.05, 0.05)])
+    det6.childs += [grilldetails]
+
+    det7 = sg.SceneGraphNode('detail1')
+    det7.transform = tr.matmul([tr.translate(1.05, 0.65, 0.4), tr.scale(0.01, 0.05, 0.05)])
+    det7.childs += [grilldetails]
+
+    det8 = sg.SceneGraphNode('detail2')
+    det8.transform = tr.matmul([tr.translate(1.05, 0.65, 0.25), tr.scale(0.01, 0.05, 0.05)])
+    det8.childs += [grilldetails]
+    
+    det9 = sg.SceneGraphNode('detail3')
+    det9.transform = tr.matmul([tr.translate(1.05, 0.65, 0.1), tr.scale(0.01, 0.05, 0.05)])
+    det9.childs += [grilldetails]
+
+    det10 = sg.SceneGraphNode('detail4')
+    det10.transform = tr.matmul([tr.translate(1.05, 0.65, -0.05), tr.scale(0.01, 0.05, 0.05)])
+    det10.childs += [grilldetails]    
+
+    det11 = sg.SceneGraphNode('detail5')
+    det11.transform = tr.matmul([tr.translate(1.05, 0.65, -0.2), tr.scale(0.01, 0.05, 0.05)])
+    det11.childs += [grilldetails]
+
+    det12 = sg.SceneGraphNode('detail6')
+    det12.transform = tr.matmul([tr.translate(1.05, 0.65, -0.35), tr.scale(0.01, 0.05, 0.05)])
+    det12.childs += [grilldetails]
 
     # Creamos el grafo de escena y los nodos 
     scene = sg.SceneGraphNode('system')
@@ -250,12 +318,22 @@ def createScene(pipeline):
 
     # Nodo para los detalles del parachoque
     bumperNode = sg.SceneGraphNode('bumper')
+
+    # Nodo para el asiento
+    seatNode = sg.SceneGraphNode('Seats')
+
+    # Nodo para los detalles delanteros
+    detailNode = sg.SceneGraphNode('FrontDetails')
+
     
     wheelsNode.childs += [frontLeft, frontRight, rearLeft, rearRight]
-    bodyNode.childs += [middleBody, rightPickup, leftPickup, backPickup, bottomPickup, grill, windshield, backBody, roof]
+    bodyNode.childs += [middleBody, rightPickup, leftPickup, backPickup, bottomPickup, grill, windshield, backBody, roof, windshieldGlass]
     coverNode.childs += [flwheelCover, frwheelCover, blwheelCover, brwheelCover]
+    seatNode.childs += [seat]
     bumperNode.childs += [bumper, rearBumper]
-    scene.childs += [wheelsNode, bodyNode, coverNode, bumperNode]
+    detailNode.childs += [det1, det2, det3, det4, det5, det6,
+                            det7, det8, det9, det10, det11, det12]
+    scene.childs += [wheelsNode, bodyNode, coverNode, bumperNode, seatNode, detailNode]
     
     scene.transform = tr.matmul([tr.uniformScale(2)])
     return scene
