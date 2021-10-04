@@ -3,7 +3,7 @@
 
 from OpenGL.GL import *
 import OpenGL.GL.shaders
-from grafica.gpu_shape import GPUShape
+from gpu_shape import GPUShape
 
 class SimpleFlatShaderProgram():
 

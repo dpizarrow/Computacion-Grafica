@@ -4,8 +4,8 @@
 from OpenGL.GL import *
 import OpenGL.GL.shaders
 import numpy as np
-import grafica.transformations as tr
-import grafica.gpu_shape as gs
+import transformations as tr
+import gpu_shape as gs
 
 __author__ = "Daniel Calderon"
 __license__ = "MIT"
