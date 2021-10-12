@@ -1,6 +1,7 @@
 # coding=utf-8
 """Tarea 3"""
 
+from os import pipe
 import glfw
 from OpenGL.GL import *
 import OpenGL.GL.shaders
@@ -25,8 +26,11 @@ class Controller:
     def __init__(self):
         self.fillPolygon = True
         self.showAxis = True
-        self.viewPos = np.array([12,12,12])
-        self.at = np.array([0,0,0])
+        # INITIAL CAMERA POS
+        #self.viewPos = np.array([2.0,0.3,6.0])
+        #self.at = np.array([2.0,-0.037409,3])
+        self.viewPos = np.array([5, 5, 5])
+        self.at = np.array([0, 0, 0])
         self.camUp = np.array([0, 1, 0])
         self.distance = 20
 
@@ -120,6 +124,11 @@ def on_key(window, key, scancode, action, mods):
     
     elif key == glfw.KEY_7:
         controller.viewPos = np.array([-controller.distance,controller.distance,controller.distance]) #Vista diagonal 2
+        controller.camUp = np.array([0,1,0])
+
+    elif key == glfw.KEY_9:
+        controller.viewPos = np.array([0.01,20,0]) #Vista diagonal 2
+        controller.at = np.array([0,0,0])
         controller.camUp = np.array([0,1,0])
     
     else:
@@ -296,14 +305,127 @@ def createTiledFloor(dim):
 # Esta función recibe como parámetro el pipeline que se usa para las texturas (texPipeline)
 
 def createHouse(pipeline):
-    pass
+    # Quad base para las paredes de la casa
+
+    wallbase = createGPUShape(pipeline, bs.createTextureQuad(1.0, 1.0))
+    wallbase.texture = es.textureSimpleSetup(
+        getAssetPath("wall4.jpg"), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_NEAREST)
+    glGenerateMipmap(GL_TEXTURE_2D)
+
+    # Quad base para el techo de la casa
+
+    roofbase = createGPUShape(pipeline, bs.createTextureQuad(1.0, 1.0))
+    roofbase.texture = es.textureSimpleSetup(
+        getAssetPath("roof1.jpg"), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_NEAREST)
+    glGenerateMipmap(GL_TEXTURE_2D)
+
+    # Nodos para el grafo de escena
+
+    structureNode = sg.SceneGraphNode('structure')
+    roofNode = sg.SceneGraphNode('roof')
+    houseNode = sg.SceneGraphNode('house')
+
+    # Nodos para las paredes de la casa
+
+    wallNode1 = sg.SceneGraphNode('wall1')
+    wallNode2 = sg.SceneGraphNode('wall2')
+    wallNode3 = sg.SceneGraphNode('wall3')
+    wallNode4 = sg.SceneGraphNode('wall4')
+
+    wallNode1.transform = tr.matmul([tr.translate(0, 0, 0), tr.uniformScale(1)])
+    wallNode1.childs += [wallbase]
+
+    wallNode2.transform = tr.matmul([tr.translate(0, 0, -1), tr.uniformScale(1)])
+    wallNode2.childs += [wallbase]
+
+    wallNode3.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(0.5, 0.0, -0.5), tr.uniformScale(1)])
+    wallNode3.childs += [wallbase]
+
+    wallNode4.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(0.5, 0.0, 0.5), tr.uniformScale(1)])
+    wallNode4.childs += [wallbase]
+
+    roofNode1 = sg.SceneGraphNode('roof1')
+    roofNode2 = sg.SceneGraphNode('roof2')
+    roofNode3 = sg.SceneGraphNode('roof3')
+    roofNode4 = sg.SceneGraphNode('roof4')
+    roofNode5 = sg.SceneGraphNode('roof5')
+    roofNode6 = sg.SceneGraphNode('roof6')
+
+    roofNode1.transform = tr.matmul([tr.translate(0.0, 0.5, -0.5), tr.rotationX(np.pi/2), tr.uniformScale(1.2)])
+    roofNode1.childs += [roofbase]
+
+    roofNode2.transform = tr.matmul([tr.translate(0.0, 0.6, 0.12), tr.scale(1.2, 0.2, 1.0)])
+    roofNode2.childs += [roofbase]
+
+    roofNode3.transform = tr.matmul([tr.translate(0.0, 0.6, -1.1), tr.scale(1.2, 0.2, 1.0)])
+    roofNode3.childs += [roofbase]
+
+    roofNode4.transform = tr.matmul([tr.translate(0.6, 0.6, -0.5), tr.scale(1.0, 0.2, 1.0), tr.rotationY(np.pi/2)])
+    roofNode4.childs += [roofbase]
+
+    roofNode5.transform = tr.matmul([tr.translate(-0.6, 0.6, -0.5), tr.scale(1.0, 0.2, 1.2), tr.rotationY(np.pi/2)])
+    roofNode5.childs += [roofbase]
+
+    roofNode6.transform = tr.matmul([tr.translate(0.0, 0.65, -0.5), tr.rotationX(np.pi/2), tr.uniformScale(1.2)])
+    roofNode6.childs += [roofbase]
+
+    structureNode.childs += [wallNode1, wallNode2, wallNode3, wallNode4]
+    roofNode.childs += [roofNode1, roofNode2, roofNode3, roofNode4, roofNode5, roofNode6]
+
+    secondRoof = sg.SceneGraphNode('secondroof')
+    secondRoof.transform = tr.matmul([tr.translate(0.0, 0.3, 0.0), tr.uniformScale(0.8)])
+    secondRoof.childs += [roofNode]
+
+    thirdRoof = sg.SceneGraphNode('thirdRoof')
+    thirdRoof.transform = tr.matmul([tr.translate(0.0, 0.55, 0.0), tr.uniformScale(0.6)])
+    thirdRoof.childs += [roofNode]
+
+    houseNode.childs += [structureNode, roofNode, secondRoof, thirdRoof]
+    return houseNode
 
 # TAREA3: Implementa la función "createWall" que crea un objeto que representa un muro
 # y devuelve un nodo de un grafo de escena (un objeto sg.SceneGraphNode) que representa toda la geometría y las texturas
 # Esta función recibe como parámetro el pipeline que se usa para las texturas (texPipeline)
 
 def createWall(pipeline):
-    pass
+    
+    # Quad base para la pared con su textura
+
+    wall = createGPUShape(pipeline, bs.createTextureQuad(1.0, 1.0))
+    wall.texture = es.textureSimpleSetup(
+        getAssetPath("wall5.jpg"), GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_NEAREST)
+    glGenerateMipmap(GL_TEXTURE_2D)
+
+    # Nodo del grafo de escena que tendra la geometria de la pared y las texturas
+    
+    wallNode = sg.SceneGraphNode('wall')
+
+    # Nodos para las distintas partes de las paredes
+    
+    wallNode1 = sg.SceneGraphNode('wall1')
+    wallNode2 = sg.SceneGraphNode('wall2')
+    wallNode3 = sg.SceneGraphNode('wall3')
+    wallNode4 = sg.SceneGraphNode('wall4')
+    wallNode5 = sg.SceneGraphNode('wall5')
+
+    wallNode1.transform = tr.matmul([tr.translate(0, 0, 0), tr.uniformScale(1)])
+    wallNode1.childs += [wall]
+
+    wallNode2.transform = tr.matmul([tr.translate(0, 0, -0.2), tr.uniformScale(1)])
+    wallNode2.childs += [wall]
+
+    wallNode3.transform = tr.matmul([tr.translate(0.5, 0.0, -0.1), tr.scale(1.0, 1.0, 0.2), tr.rotationY(np.pi/2)])
+    wallNode3.childs += [wall]
+
+    wallNode4.transform = tr.matmul([tr.translate(-0.5, 0.0, -0.1), tr.scale(1.0, 1.0, 0.2), tr.rotationY(np.pi/2)])
+    wallNode4.childs += [wall]
+
+    wallNode5.transform = tr.matmul([tr.translate(0.0, 0.5, 0.0), tr.scale(1.0, 1.0, 0.015), tr.rotationX(np.pi/2)])
+    wallNode5.childs += [wall]
+
+    wallNode.childs += [wallNode1, wallNode2, wallNode3, wallNode4, wallNode5]
+    return wallNode
+
 
 # TAREA3: Esta función crea un grafo de escena especial para el auto.
 def createCarScene(pipeline):
@@ -365,7 +487,28 @@ def createStaticScene(pipeline):
 
     arcShape = createGPUShape(pipeline, createTexturedArc(1.5))
     arcShape.texture = roadBaseShape.texture
+
+    paredNode = createWall(pipeline)
+    paredNode.transform = tr.matmul([tr.translate(2.0, 0.0, 0.0), tr.rotationY(np.pi/2)])
+
+    houseNode = createHouse(pipeline)
+    houseNode.transform = tr.matmul([tr.translate(-4, 0.0, 0.0)])
     
+    houseNode2 = createHouse(pipeline)
+    houseNode2.transform = tr.matmul([tr.translate(-4, 0.0, 2.0)])
+
+    houseNode3 = createHouse(pipeline)
+    houseNode3.transform = tr.matmul([tr.translate(-4, 0.0, -2.0)])
+
+    houseNode4 = createHouse(pipeline)
+    houseNode4.transform = tr.matmul([tr.translate(4, 0.0, 0.0)])
+
+    houseNode5 = createHouse(pipeline)
+    houseNode5.transform = tr.matmul([tr.translate(4, 0.0, 2.0)])
+
+    houseNode6 = createHouse(pipeline)
+    houseNode6.transform = tr.matmul([tr.translate(4, 0.0, -2.0)])
+
     roadBaseNode = sg.SceneGraphNode('plane')
     roadBaseNode.transform = tr.rotationX(-np.pi/2)
     roadBaseNode.childs += [roadBaseShape]
@@ -400,13 +543,15 @@ def createStaticScene(pipeline):
     arcBottom = sg.SceneGraphNode('arcBottom')
     arcBottom.transform = tr.matmul([tr.translate(0.0,0.0,5.5), tr.rotationY(np.pi)])
     arcBottom.childs += [arcNode]
-    
+   
     scene = sg.SceneGraphNode('system')
     scene.childs += [linearSectorLeft]
     scene.childs += [linearSectorRight]
     scene.childs += [arcTop]
     scene.childs += [arcBottom]
     scene.childs += [sandNode]
+    scene.childs += [paredNode]
+    scene.childs += [houseNode, houseNode2, houseNode3, houseNode4, houseNode5, houseNode6]
     
     return scene
 
