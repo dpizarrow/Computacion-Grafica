@@ -26,14 +26,9 @@ class Controller:
     def __init__(self):
         self.fillPolygon = True
         self.showAxis = True
-        # INITIAL CAMERA POS
-        #self.viewPos = np.array([2.0,0.3,6.0])
-        #self.at = np.array([2.0,-0.037409,3])
-        self.viewPos = np.array([5, 5, 5])
-        self.at = np.array([0, 0, 0])
+        self.viewPos = np.array([2.0, 0.3, 6.0])
+        self.at = np.array([2.0, -0.037409, 3])
         self.camUp = np.array([0, 1, 0])
-        self.distance = 20
-
 
 controller = Controller()
 
@@ -98,42 +93,6 @@ def on_key(window, key, scancode, action, mods):
     elif key == glfw.KEY_ESCAPE:
         glfw.set_window_should_close(window, True)
     
-    elif key == glfw.KEY_1:
-        controller.viewPos = np.array([controller.distance,controller.distance,controller.distance]) #Vista diagonal 1
-        controller.camUp = np.array([0,1,0])
-    
-    elif key == glfw.KEY_2:
-        controller.viewPos = np.array([0,0,controller.distance]) #Vista frontal
-        controller.camUp = np.array([0,1,0])
-
-    elif key == glfw.KEY_3:
-        controller.viewPos = np.array([controller.distance,0,controller.distance]) #Vista lateral
-        controller.camUp = np.array([0,1,0])
-
-    elif key == glfw.KEY_4:
-        controller.viewPos = np.array([0,controller.distance,0]) #Vista superior
-        controller.camUp = np.array([1,0,0])
-    
-    elif key == glfw.KEY_5:
-        controller.viewPos = np.array([controller.distance,controller.distance,-controller.distance]) #Vista diagonal 2
-        controller.camUp = np.array([0,1,0])
-    
-    elif key == glfw.KEY_6:
-        controller.viewPos = np.array([-controller.distance,controller.distance,-controller.distance]) #Vista diagonal 2
-        controller.camUp = np.array([0,1,0])
-    
-    elif key == glfw.KEY_7:
-        controller.viewPos = np.array([-controller.distance,controller.distance,controller.distance]) #Vista diagonal 2
-        controller.camUp = np.array([0,1,0])
-
-    elif key == glfw.KEY_9:
-        controller.viewPos = np.array([0.01,20,0]) #Vista diagonal 2
-        controller.at = np.array([0,0,0])
-        controller.camUp = np.array([0,1,0])
-    
-    else:
-        print('Unknown key')
-
 def createOFFShape(pipeline, filename, r,g, b):
     shape = readOFF(getAssetPath(filename), (r, g, b))
     gpuShape = es.GPUShape().initBuffers()
@@ -354,16 +313,16 @@ def createHouse(pipeline):
     roofNode1.transform = tr.matmul([tr.translate(0.0, 0.5, -0.5), tr.rotationX(np.pi/2), tr.uniformScale(1.2)])
     roofNode1.childs += [roofbase]
 
-    roofNode2.transform = tr.matmul([tr.translate(0.0, 0.6, 0.12), tr.scale(1.2, 0.2, 1.0)])
+    roofNode2.transform = tr.matmul([tr.translate(0.0, 0.6, 0.1), tr.scale(1.2, 0.18, 1.0)])
     roofNode2.childs += [roofbase]
 
-    roofNode3.transform = tr.matmul([tr.translate(0.0, 0.6, -1.1), tr.scale(1.2, 0.2, 1.0)])
+    roofNode3.transform = tr.matmul([tr.translate(0.0, 0.6, -1.1), tr.scale(1.2, 0.18, 1.0)])
     roofNode3.childs += [roofbase]
 
-    roofNode4.transform = tr.matmul([tr.translate(0.6, 0.6, -0.5), tr.scale(1.0, 0.2, 1.0), tr.rotationY(np.pi/2)])
+    roofNode4.transform = tr.matmul([tr.translate(0.6, 0.6, -0.5), tr.scale(1.0, 0.18, 1.2), tr.rotationY(np.pi/2)])
     roofNode4.childs += [roofbase]
 
-    roofNode5.transform = tr.matmul([tr.translate(-0.6, 0.6, -0.5), tr.scale(1.0, 0.2, 1.2), tr.rotationY(np.pi/2)])
+    roofNode5.transform = tr.matmul([tr.translate(-0.6, 0.6, -0.5), tr.scale(1.0, 0.18, 1.2), tr.rotationY(np.pi/2)])
     roofNode5.childs += [roofbase]
 
     roofNode6.transform = tr.matmul([tr.translate(0.0, 0.65, -0.5), tr.rotationX(np.pi/2), tr.uniformScale(1.2)])
@@ -420,7 +379,7 @@ def createWall(pipeline):
     wallNode4.transform = tr.matmul([tr.translate(-0.5, 0.0, -0.1), tr.scale(1.0, 1.0, 0.2), tr.rotationY(np.pi/2)])
     wallNode4.childs += [wall]
 
-    wallNode5.transform = tr.matmul([tr.translate(0.0, 0.5, 0.0), tr.scale(1.0, 1.0, 0.015), tr.rotationX(np.pi/2)])
+    wallNode5.transform = tr.matmul([tr.translate(0.0, 0.5, -0.1), tr.scale(1.0, 1.0, 0.2), tr.rotationX(np.pi/2)])
     wallNode5.childs += [wall]
 
     wallNode.childs += [wallNode1, wallNode2, wallNode3, wallNode4, wallNode5]
@@ -457,7 +416,6 @@ def createCarScene(pipeline):
     wheel4Node.childs += [rotatingWheelNode]
 
     car1 = sg.SceneGraphNode('car1')
-    car1.transform = tr.matmul([tr.translate(2.0, -0.037409, 5.0), tr.rotationY(np.pi)])
     car1.childs += [chasisNode]
     car1.childs += [wheel1Node]
     car1.childs += [wheel2Node]
@@ -489,8 +447,27 @@ def createStaticScene(pipeline):
     arcShape.texture = roadBaseShape.texture
 
     paredNode = createWall(pipeline)
-    paredNode.transform = tr.matmul([tr.translate(2.0, 0.0, 0.0), tr.rotationY(np.pi/2)])
+    paredNode.transform = tr.matmul([tr.translate(1.5, 0.0, 0.0), tr.rotationY(np.pi/2)])
 
+    paredNode2 = createWall(pipeline)
+    paredNode2.transform = tr.matmul([tr.translate(-1.3, 0.0, 0.0), tr.rotationY(np.pi/2)])
+    
+    for i in range(1, 4):
+        node = createWall(pipeline)
+        node2 = createWall(pipeline)
+        node.transform = tr.matmul([tr.translate(-1.5*i, 0.0, 0.0)])
+        node2.transform = tr.matmul([tr.translate(-1.5*i, 0, 0)])
+        paredNode.childs += [node]
+        paredNode2.childs += [node2]
+
+    for i in range(1, 4):
+        node = createWall(pipeline)
+        node2 = createWall(pipeline)
+        node.transform = tr.matmul([tr.translate(1.5*i, 0.0, 0.0)])
+        node2.transform = tr.matmul([tr.translate(1.5*i, 0, 0)])
+        paredNode.childs += [node]
+        paredNode2.childs += [node2]
+    
     houseNode = createHouse(pipeline)
     houseNode.transform = tr.matmul([tr.translate(-4, 0.0, 0.0)])
     
@@ -550,7 +527,7 @@ def createStaticScene(pipeline):
     scene.childs += [arcTop]
     scene.childs += [arcBottom]
     scene.childs += [sandNode]
-    scene.childs += [paredNode]
+    scene.childs += [paredNode, paredNode2]
     scene.childs += [houseNode, houseNode2, houseNode3, houseNode4, houseNode5, houseNode6]
     
     return scene
@@ -565,7 +542,7 @@ if __name__ == "__main__":
 
     width = 800
     height = 800
-    title = "Tarea 2"
+    title = "Tarea 3 Diego Pizarro W."
     window = glfw.create_window(width, height, title, None, None)
 
     if not window:
@@ -600,7 +577,7 @@ if __name__ == "__main__":
 
     #NOTA: Aqui creas un objeto con tu escena
     dibujo = createStaticScene(texPipeline)
-    car =createCarScene(lightPipeline)
+    car = createCarScene(lightPipeline)
 
     setPlot(texPipeline, axisPipeline,lightPipeline)
 
@@ -608,6 +585,13 @@ if __name__ == "__main__":
 
     # glfw will swap buffers as soon as possible
     glfw.swap_interval(0)
+
+    t0 = glfw.get_time()
+
+    # Posicion inicial del auto y su angulo
+
+    carPos = np.array([2.0, -0.037409, 5.0])
+    carAngle = np.pi/2
 
     while not glfw.window_should_close(window):
 
@@ -617,6 +601,56 @@ if __name__ == "__main__":
 
         # Using GLFW to check for input events
         glfw.poll_events()
+
+        # Parametros para controlar el movimiento del auto y la camara
+
+        speed = 3
+        turning = 1.5
+        cam_radius = 1
+        
+        # Obtenemos la diferencia de tiempo en cada iteracion
+
+        t1 = glfw.get_time()
+        dt = t1-t0
+        t0 = t1
+
+        # El auto solamente gira si se esta aprentando la tecla A (o D) junto con la tecla W (o S)
+
+        if ((glfw.get_key(window, glfw.KEY_A) == glfw.PRESS) and (glfw.get_key(window, glfw.KEY_W) == glfw.PRESS or glfw.get_key(window, glfw.KEY_S) == glfw.PRESS)):
+            carAngle -= turning * dt
+            
+        elif((glfw.get_key(window, glfw.KEY_D) == glfw.PRESS) and (glfw.get_key(window, glfw.KEY_W) == glfw.PRESS or glfw.get_key(window, glfw.KEY_S) == glfw.PRESS)):
+            carAngle += turning * dt
+
+        # Al apretar la tecla W el auto se desplaza hacia el eje Z negativo
+        
+        if(glfw.get_key(window, glfw.KEY_W) == glfw.PRESS):
+            carPos[0] -= np.cos(carAngle) * speed * dt
+            carPos[2] -= np.sin(carAngle) * speed * dt
+        
+        # Analogo a la tecla W, pero hacia el Z positivo
+        
+        elif(glfw.get_key(window, glfw.KEY_S) == glfw.PRESS):
+            carPos[0] += np.cos(carAngle) * speed * dt
+            carPos[2] += np.sin(carAngle) * speed * dt
+
+        # Vector que denota la posicion del auto, ayudara para contolar la camara
+        
+        carAt = np.array([carPos[0] + cam_radius * np.cos(carAngle),
+                        carPos[1], 
+                        carPos[2] + cam_radius * np.sin(carAngle)])
+
+        # Vector que apunta hacia donde este mirando el auto, normalizado
+        
+        camVec = carPos - carAt
+        camVec = camVec / np.linalg.norm(camVec)
+
+        controller.at = carAt + camVec * 2
+        controller.viewPos = carPos - 1.3 * camVec + controller.camUp
+        
+        # Aplicamos la transformacion, primero rotamos el auto y luego lo desplazamos hacia su posicion
+
+        sg.findNode(car, 'system').transform = tr.matmul([tr.translate(carPos[0], carPos[1], carPos[2]), tr.rotationY(-np.pi/2 - carAngle)])
 
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -628,7 +662,7 @@ if __name__ == "__main__":
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
         setView(texPipeline, axisPipeline, lightPipeline)
-
+        
         if controller.showAxis:
             glUseProgram(axisPipeline.shaderProgram)
             glUniformMatrix4fv(glGetUniformLocation(axisPipeline.shaderProgram, "model"), 1, GL_TRUE, tr.identity())
@@ -641,8 +675,6 @@ if __name__ == "__main__":
         glUseProgram(lightPipeline.shaderProgram)
         sg.drawSceneGraphNode(car, lightPipeline, "model")
 
-        
-
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)
 
@@ -650,5 +682,4 @@ if __name__ == "__main__":
     gpuAxis.clear()
     dibujo.clear()
     
-
     glfw.terminate()
