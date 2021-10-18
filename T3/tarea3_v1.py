@@ -303,6 +303,8 @@ def createHouse(pipeline):
     wallNode4.transform = tr.matmul([tr.rotationY(np.pi/2), tr.translate(0.5, 0.0, 0.5), tr.uniformScale(1)])
     wallNode4.childs += [wallbase]
 
+    # Nodos para las partes del techo
+    
     roofNode1 = sg.SceneGraphNode('roof1')
     roofNode2 = sg.SceneGraphNode('roof2')
     roofNode3 = sg.SceneGraphNode('roof3')
@@ -331,6 +333,8 @@ def createHouse(pipeline):
     structureNode.childs += [wallNode1, wallNode2, wallNode3, wallNode4]
     roofNode.childs += [roofNode1, roofNode2, roofNode3, roofNode4, roofNode5, roofNode6]
 
+    # El techo tiene la forma de 3 prismas puestas unas encima del otro
+    
     secondRoof = sg.SceneGraphNode('secondroof')
     secondRoof.transform = tr.matmul([tr.translate(0.0, 0.3, 0.0), tr.uniformScale(0.8)])
     secondRoof.childs += [roofNode]
@@ -452,6 +456,8 @@ def createStaticScene(pipeline):
     paredNode2 = createWall(pipeline)
     paredNode2.transform = tr.matmul([tr.translate(-1.3, 0.0, 0.0), tr.rotationY(np.pi/2)])
     
+    # Creamos 4 paredes en el cuadrante X negativo
+    
     for i in range(1, 4):
         node = createWall(pipeline)
         node2 = createWall(pipeline)
@@ -460,6 +466,8 @@ def createStaticScene(pipeline):
         paredNode.childs += [node]
         paredNode2.childs += [node2]
 
+    # Creamos 4 paredes en el cuadrante X positivo
+    
     for i in range(1, 4):
         node = createWall(pipeline)
         node2 = createWall(pipeline)
@@ -467,6 +475,8 @@ def createStaticScene(pipeline):
         node2.transform = tr.matmul([tr.translate(1.5*i, 0, 0)])
         paredNode.childs += [node]
         paredNode2.childs += [node2]
+    
+    # Creamos 6 casas: 3 en el cuadrante X negativo y 3 en el cuadrante X positivo
     
     houseNode = createHouse(pipeline)
     houseNode.transform = tr.matmul([tr.translate(-4, 0.0, 0.0)])
@@ -586,6 +596,8 @@ if __name__ == "__main__":
     # glfw will swap buffers as soon as possible
     glfw.swap_interval(0)
 
+    # Tiempo inicial
+    
     t0 = glfw.get_time()
 
     # Posicion inicial del auto y su angulo
