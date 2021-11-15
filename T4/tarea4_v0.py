@@ -58,8 +58,6 @@ controller = Controller()
 #TAREA4: aquí se crea el pool de luces spotlight (como un diccionario)
 spotlightsPool = dict()
 
-#TAREA4: Esta función ejemplifica cómo podemos crear luces para nuestra escena. En este caso creamos 2 luces con diferentes 
-# parámetros
 
 coord_X = 0 
 coord_Z = 0
@@ -92,9 +90,11 @@ def evalCurve(M, N):
 
     return curve
 
-#In total there are 5 lights. Two per car and one high up to bring out the detail in the car's model.
+# En total hay 4 luces, uno para cada foco de los autos
 def setLights():
     
+    # Luz izquierda del auto que es controlado con las teclas
+
     spot1 = Spotlight()
     spot1.ambient = np.array([0.0, 0.0, 0.0])
     spot1.diffuse = np.array([1.0, 1.0, 1.0])
@@ -108,7 +108,8 @@ def setLights():
     spot1.outerCutOff = np.cos(np.radians(30))                     
     spotlightsPool['leftLight'] = spot1 
 
-    
+    # Luz derecha del auto que es controlado con las teclas
+
     spot2 = Spotlight()
     spot2.ambient = np.array([0.0, 0.0, 0.0])
     spot2.diffuse = np.array([1.0, 1.0, 1.0])
@@ -122,7 +123,8 @@ def setLights():
     spot2.outerCutOff = np.cos(np.radians(30)) 
     spotlightsPool['rightLight'] = spot2 
 
-    
+    # Luz derecha del auto que se mueve solo
+
     spot3 = Spotlight()
     spot3.ambient = np.array([0.0, 0.0, 0.0])
     spot3.diffuse = np.array([1.0, 1.0, 1.0])
@@ -130,11 +132,13 @@ def setLights():
     spot3.constant = 1
     spot3.linear = 0.09
     spot3.quadratic = 0.032
-    spot3.position = np.array([0, 10, 0])
+    spot3.position = np.array([-2, 5, 0]) 
     spot3.direction = np.array([0, -1, 0]) 
     spot3.cutOff = np.cos(np.radians(12.5))
-    spot3.outerCutOff = np.cos(np.radians(45)) 
-    spotlightsPool['spot3'] = spot3 
+    spot3.outerCutOff = np.cos(np.radians(30)) 
+    spotlightsPool['car2right'] = spot3  
+
+    # Luz izquierda del auto que se mueve solo
 
     spot4 = Spotlight()
     spot4.ambient = np.array([0.0, 0.0, 0.0])
@@ -147,20 +151,7 @@ def setLights():
     spot4.direction = np.array([0, -1, 0]) 
     spot4.cutOff = np.cos(np.radians(12.5))
     spot4.outerCutOff = np.cos(np.radians(30)) 
-    spotlightsPool['AIrightLight'] = spot4  
-
-    spot5 = Spotlight()
-    spot5.ambient = np.array([0.0, 0.0, 0.0])
-    spot5.diffuse = np.array([1.0, 1.0, 1.0])
-    spot5.specular = np.array([1.0, 1.0, 1.0])
-    spot5.constant = 1
-    spot5.linear = 0.09
-    spot5.quadratic = 0.032
-    spot5.position = np.array([-2, 5, 0]) 
-    spot5.direction = np.array([0, -1, 0]) 
-    spot5.cutOff = np.cos(np.radians(12.5))
-    spot5.outerCutOff = np.cos(np.radians(30)) 
-    spotlightsPool['AIleftLight'] = spot5  
+    spotlightsPool['car2left'] = spot4  
 
 
 #TAREA4: modificamos esta función para poder configurar todas las luces del pool
@@ -289,7 +280,7 @@ if __name__ == "__main__":
 
     width = 800
     height = 800
-    title = "Tarea 4"
+    title = "Tarea 4 Diego Pizarro W."
     window = glfw.create_window(width, height, title, None, None)
 
     if not window:
@@ -330,7 +321,10 @@ if __name__ == "__main__":
 
     dibujo = createStaticScene(texPipeline)
     car = createCarScene(lightPipeline)
-    car_AI = createCarScene(lightPipeline) #Here we create a new car, this one will be indentical but will move on it's own on a path.
+    
+    # Creamos el segundo auto que se movera solo por la pista
+    
+    car2 = createCarScene(lightPipeline) 
 
     
     perfMonitor = pm.PerformanceMonitor(glfw.get_time(), 0.5)
@@ -341,55 +335,63 @@ if __name__ == "__main__":
     #parametro iniciales
     t0 = glfw.get_time()
     
-    #Here we'll make the path the car will follow.
-    #First Straight Path.
+    # Creamos la curva por la cual se movera el segundo auto
+
+    # Creamos la primera parte recta de la curva
+
     N = 200
     P1 = np.array([[1.5,0.037409,5.5]]).T
     P2 = np.array([[1.5,0.037409,-4.5]]).T
     T1 = np.array([[0, 0.037409, 0]]).T
     T2 = np.array([[0, 0.037409, 0]]).T
 
-    GMh1 = hermiteMatrix(P1, P2, T1, T2)
-    hermiteCurve1 = evalCurve(GMh1, N)
+    mat1 = hermiteMatrix(P1, P2, T1, T2)
+    hermiteCurve1 = evalCurve(mat1, N)
 
-    #Second straight path
+    # Creamos la segunda curva recta
+    
     P3 = np.array([[-2.5,0.037409,-4.5]]).T
     P4 = np.array([[-2.5,0.037409,5.5]]).T
     T3 = np.array([[0, 0.037409, 0]]).T
     T4 = np.array([[0, 0.037409, 0]]).T
 
-    GMh2 = hermiteMatrix(P3, P4, T3, T4)
-    hermiteCurve2 = evalCurve(GMh2, N)
+    mat2 = hermiteMatrix(P3, P4, T3, T4)
+    hermiteCurve2 = evalCurve(mat2, N)
 
-    #First Curve
+    # Primera curva
+    
     P5 = np.array([[1.5,0.037409,-4.5]]).T
     P6 = np.array([[-2.5,0.037409,-4.5]]).T
     T5 = np.array([[0, 0, -8]]).T
     T6 = np.array([[0, 0, 8]]).T
 
-    GMh3 = hermiteMatrix(P5, P6, T5, T6)
-    hermiteCurve3 = evalCurve(GMh3, N)
+    mat3 = hermiteMatrix(P5, P6, T5, T6)
+    hermiteCurve3 = evalCurve(mat3, N)
 
-    #Second Curve
+    # Segunda curva
+    
     P7 = np.array([[-2.5,0.037409,5.5]]).T
     P8 = np.array([[1.5,0.037409,5.5]]).T
     T7 = np.array([[0, 0, 8]]).T
     T8 = np.array([[0, 0, -8]]).T
 
-    GMh4 = hermiteMatrix(P7,P8,T7,T8)
-    hermiteCurve4 = evalCurve(GMh4, N)
+    mat4 = hermiteMatrix(P7,P8,T7,T8)
+    hermiteCurve4 = evalCurve(mat4, N)
 
-    #Here we concatenate all 4 curves in the order they appear.
-    hermiteCurve = np.concatenate((hermiteCurve1,hermiteCurve3,hermiteCurve2,hermiteCurve4))
+    # Concatenamos todas las curvas
+    
+    C = np.concatenate((hermiteCurve1,hermiteCurve3,hermiteCurve2,hermiteCurve4))
     
 
-    #Here we define the AI car place in the path and it's angle
-    place = 0
-    angle = 0
+    # Definimos los parametros que nos ayudaran a controlar el movimiento del auto por la curva
     
-    #When the place will switch
-    whenSwitch = 1
-    switch = 0
+    step = 0
+    angle2 = 0
+    
+    # Definimos una variable que nos ayudara a controlar la velocidad del auto
+
+    t = 0
+
     while not glfw.window_should_close(window):
 
         # Measuring performance
@@ -440,22 +442,25 @@ if __name__ == "__main__":
                                 car_pos[1], 
                                 car_pos[2] + np.sin(controller.cameraThetaAngle + np.pi/2)])
 
-        #This is the car at guiding vector
-        guidingVector = car_pos - car_at
-        guidingVector = guidingVector/np.linalg.norm(guidingVector)
-
-        guidingVectorSide = car_pos - car_at_right
-        guidingVectorSide = guidingVectorSide/np.linalg.norm(guidingVectorSide)
-
-        #Here we set the lights, one to the right and one to the left
-        spotlightsPool["leftLight"].direction = guidingVector
-        spotlightsPool["leftLight"].position = np.array([car_pos - 0.1*guidingVectorSide + 0.4*guidingVector]) + np.array([0,0.1,0])
-
-        spotlightsPool["rightLight"].direction = guidingVector
-        spotlightsPool["rightLight"].position = np.array([car_pos + 0.1*guidingVectorSide + 0.4*guidingVector]) + np.array([0,0.1,0])
-
+        # Vectores para las luces del auto controlado con  las teclas
         
+        carLight = car_pos - car_at
+        carLight = carLight/np.linalg.norm(carLight)
 
+        # Normalizamos el vector
+
+        carLightR = car_pos - car_at_right
+        carLightR = carLightR/np.linalg.norm(carLightR)
+
+        # Fijamos las posiciones y direcciones de los vectores de las luces del auto
+        
+        spotlightsPool["leftLight"].direction = carLight
+        spotlightsPool["leftLight"].position = np.array([car_pos - 0.1*carLightR + 0.4*carLight]) + np.array([0,0.1,0])
+
+        spotlightsPool["rightLight"].direction = carLight
+        spotlightsPool["rightLight"].position = np.array([car_pos + 0.1*carLightR + 0.4*carLight]) + np.array([0,0.1,0])
+
+    
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -486,52 +491,61 @@ if __name__ == "__main__":
         Auto = sg.findNode(car,'system-car')
         Auto.transform = tr.matmul([tr.translate(coord_X+2,-0.037409,coord_Z+5),tr.rotationY(np.pi+angulo),tr.rotationY(-np.pi),tr.translate(-2,0.037409,-5)])
         
-        #Code taken from one of the examples to change angle to orientate the car and it's lights.
-        if place > N*4-1:
-            place = 0
-        if place < N*4-1:
-            angle = np.arctan2(hermiteCurve[place+1,0]-hermiteCurve[place,0], hermiteCurve[place+1,2]-hermiteCurve[place,2])
+        
+        if step > N*4-1:
+            step = 0
+        if step < N*4-1:
+            angle2 = np.arctan2(C[step+1,0]-C[step,0], C[step+1,2]-C[step,2])
         else:
-            angle = np.arctan2(hermiteCurve[0,0]-hermiteCurve[place,0],hermiteCurve[0,2]-hermiteCurve[place,2])
+            angle2 = np.arctan2(C[0,0]-C[step,0],C[0,2]-C[step,2])
 
-        #Here we draw a new car, the one that'll move on it's own.
-        sg.drawSceneGraphNode(car_AI, lightPipeline, "model")
-
-        #Position of the car
-        AIpos = np.array([hermiteCurve[place][0],hermiteCurve[place][1],hermiteCurve[place][2]]) + np.array([0.5,0,0])
-        #Placing the car along the curve and turning with a certain angle
-        Auto_AI = sg.findNode(car_AI,'system-car')
-        Auto_AI.transform = tr.matmul([tr.translate(AIpos[0],AIpos[1],AIpos[2]),tr.rotationY(angle+np.pi),tr.translate(-2,0,-5)])
-        #Vector where the car is looking at
-        AI_at = np.array([AIpos[0] - np.cos(angle-np.pi/2),
-                                AIpos[1], 
-                                AIpos[2] + np.sin(angle-np.pi/2)])
-        #Vector that is perpendicular to at  
-        AI_at_right = np.array([AIpos[0] - np.cos(angle),
-                                AIpos[1], 
-                                AIpos[2] + np.sin(angle)])
-
-        #Here we normalise the vectors
-        AIguidingVector = AIpos - AI_at
-        AIguidingVector = AIguidingVector/np.linalg.norm(AIguidingVector)
-
-        AIguidingVectorSide = AIpos - AI_at_right
-        AIguidingVectorSide = AIguidingVectorSide/np.linalg.norm(AIguidingVectorSide)
+        # Dibujamos el auto que se mueve solo
         
-        #Finally we define the lights much like the other car using the vectors.
-        spotlightsPool["AIleftLight"].direction = AIguidingVector
-        spotlightsPool["AIleftLight"].position = np.array([AIpos - 0.1*AIguidingVectorSide + 0.1*AIguidingVector]) + np.array([0,0.1,0])
+        sg.drawSceneGraphNode(car2, lightPipeline, "model")
 
-        spotlightsPool["AIrightLight"].direction = AIguidingVector
-        spotlightsPool["AIrightLight"].position = np.array([AIpos + 0.1*AIguidingVectorSide + 0.1*AIguidingVector]) + np.array([0,0.1,0])
-
-
-        #Here is when the switch is changed to slow down the iteration through the path
-        switch = (switch+1)%(whenSwitch+1)
+        # Posicion del segundo auto
         
-        #So that it doesn't advance every iteration, making the animation a bit slower
-        if((switch) == whenSwitch):
-            place +=1    
+        car2pos = np.array([C[step][0],C[step][1],C[step][2]]) + np.array([0.5,0,0])
+        
+        # Buscamos el segundo auto y le aplicamos la transformacion segun la forma de la curva
+        
+        car2node = sg.findNode(car2,'system-car')
+        car2node.transform = tr.matmul([tr.translate(car2pos[0],car2pos[1],car2pos[2]),tr.rotationY(angle2+np.pi),tr.translate(-2,0,-5)])
+        
+        #Vector que apunta hacia adonde esta mirando el auto que se mueve solo 
+        
+        car2at = np.array([car2pos[0] - np.cos(angle2-np.pi/2),
+                                car2pos[1], 
+                                car2pos[2] + np.sin(angle2-np.pi/2)])
+        
+        # Vector perpendicular al car2_at
+     
+        car2at_right = np.array([car2pos[0] - np.cos(angle2),
+                                car2pos[1], 
+                                car2pos[2] + np.sin(angle2)])
+
+        # Normalizamos
+        car2Light = car2pos - car2at
+        car2Light = car2Light/np.linalg.norm(car2Light)
+
+        car2LightR = car2pos - car2at_right
+        car2LightR = car2LightR/np.linalg.norm(car2LightR)
+        
+        # Al igual que para el otro auto, definimos las posiciones y direcciones de las luces
+        
+        spotlightsPool["car2left"].direction = car2Light
+        spotlightsPool["car2left"].position = np.array([car2pos - 0.1*car2LightR + 0.4*car2Light]) + np.array([0,0.1,0])
+
+        spotlightsPool["car2right"].direction = car2Light
+        spotlightsPool["car2right"].position = np.array([car2pos + 0.1*car2LightR + 0.4*car2Light]) + np.array([0,0.1,0])
+
+
+        # Modoficamos los valores del auto para que no vaya tan rapido
+
+        t = (t+1) % 5
+        
+        if((t) == 4):
+            step +=1    
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)
