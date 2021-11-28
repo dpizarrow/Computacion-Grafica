@@ -14,6 +14,7 @@ import scene_graph as sg
 import easy_shaders as es
 import lighting_shaders as ls
 import performance_monitor as pm
+import collisions as cl
 from assets_path import getAssetPath
 from auxiliarT5 import *
 from operator import add
@@ -263,6 +264,8 @@ def on_key(window, key, scancode, action, mods):
         print('Unknown key')
     
 if __name__ == "__main__":
+
+    window = None
 
     # Initialize glfw
     if not glfw.init():
