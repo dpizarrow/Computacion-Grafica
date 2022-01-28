@@ -17,3 +17,7 @@
 ## Tarea 4
 
 - Crear luces spotlight que simulan los focos de un auto, y otro auto que se mueve solo siguiendo una curva de Hermite
+
+## Tarea 5
+
+- Implementar colisiones en base a lo realizado en la Tarea 4
